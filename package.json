@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "ng serve",
+    "demo:local": "ng serve --host 127.0.0.1",
     "build": "ng build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",

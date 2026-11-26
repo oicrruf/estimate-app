@@ -1,0 +1,176 @@
+<div class="demo-page">
+  <header class="demo-header">
+    <a class="brand" href="/" aria-label="Estimate Agent, volver al inicio">
+      <span class="brand-mark" aria-hidden="true">E</span> Estimate Agent
+    </a>
+    <span class="header-note">Vista local de demostración</span>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="demo-title">
+      <p class="eyebrow">AT-278 · Candidata para prueba local</p>
+      <h1 id="demo-title">De la solicitud a la evidencia.</h1>
+      <p>
+        Consulta una evaluación técnica sobre datos ficticios. Esta vista es de solo lectura y no
+        crea proyectos, cotizaciones ni compras.
+      </p>
+    </section>
+
+    <div class="columns">
+      <section class="panel request" aria-labelledby="request-title">
+        <p class="step">01 / Solicitud</p>
+        <h2 id="request-title">Elige qué evaluar</h2>
+        <form (submit)="evaluate($event)">
+          <label for="scenario">Escenario</label>
+          <select
+            id="scenario"
+            name="scenario"
+            [value]="scenario()"
+            (change)="chooseScenario($event)"
+          >
+            <option value="switch">Switch PoE</option>
+            <option value="camera">Cámara PoE</option>
+            <option value="ups">UPS</option>
+          </select>
+
+          @if (scenario() === 'switch') {
+            <fieldset>
+              <legend>Puertos PoE mínimos</legend>
+              <label class="radio-option"
+                ><input
+                  type="radio"
+                  name="poe"
+                  [checked]="poePortsMin() === 8"
+                  (change)="choosePoe(8)"
+                />
+                8 puertos</label
+              >
+              <label class="radio-option"
+                ><input
+                  type="radio"
+                  name="poe"
+                  [checked]="poePortsMin() === 12"
+                  (change)="choosePoe(12)"
+                />
+                12 puertos</label
+              >
+            </fieldset>
+          }
+          @if (scenario() === 'camera') {
+            <fieldset>
+              <legend>Cámaras solicitadas</legend>
+              <label class="radio-option"
+                ><input
+                  type="radio"
+                  name="quantity"
+                  [checked]="quantity() === 2"
+                  (change)="chooseQuantity(2)"
+                />
+                2 cámaras</label
+              >
+              <label class="radio-option"
+                ><input
+                  type="radio"
+                  name="quantity"
+                  [checked]="quantity() === 4"
+                  (change)="chooseQuantity(4)"
+                />
+                4 cámaras</label
+              >
+            </fieldset>
+          }
+          @if (scenario() === 'ups') {
+            <p class="field-hint">Se consulta el requisito fijo de capacidad del fixture UPS.</p>
+          }
+          <button type="submit" [disabled]="loading()">
+            {{ loading() ? 'Evaluando…' : 'Evaluar fixture' }}
+          </button>
+        </form>
+        <p class="fine-print">
+          El navegador llama al servicio local por el mismo origen. No se solicitan credenciales.
+        </p>
+      </section>
+
+      <section class="panel decision" aria-labelledby="decision-title" aria-live="polite">
+        <p class="step">02 / Decisión técnica</p>
+        <h2 id="decision-title">Resultado y ruta</h2>
+        @if (loading()) {
+          <p class="notice">Consultando la evidencia local…</p>
+        } @else if (error()) {
+          <p class="notice error" role="alert">
+            No se pudo obtener una evaluación válida del servicio local. Comprueba que esté iniciado
+            y vuelve a intentar.
+          </p>
+        } @else if (result(); as evaluation) {
+          <p class="context">
+            {{ scenarioLabel(evaluation.scenario) }}
+            @if (lastRequest()?.scenario === 'switch') {
+              · {{ poePortsMin() }} puertos PoE mínimos
+            }
+            @if (lastRequest()?.scenario === 'camera') {
+              · {{ quantity() }} cámaras solicitadas
+            }
+          </p>
+          <p class="decision-head">{{ decisionLabel(evaluation) }}</p>
+          @if (evaluation.scenario === 'camera' && evaluation.availableQuantity !== undefined) {
+            <p class="stock">
+              Inventario compartido disponible: <strong>{{ evaluation.availableQuantity }}</strong>
+              @if (evaluation.requestedQuantity !== undefined) {
+                de {{ evaluation.requestedQuantity }} solicitadas
+              }
+            </p>
+          }
+          @for (candidate of evaluation.candidates; track candidate.productId) {
+            <article class="candidate" [attr.aria-label]="'Candidato ' + candidate.productId">
+              <div class="candidate-head">
+                <h3>{{ candidate.productId }}</h3>
+                <span class="badge">{{ statusLabel(candidate) }}</span>
+              </div>
+              <ul class="reasons">
+                @for (reason of candidate.reasonCodes; track $index) {
+                  <li>{{ reasonLabel(reason) }}</li>
+                }
+              </ul>
+              <p class="offer">
+                {{
+                  candidate.offerIds.length === 0
+                    ? 'Sin oferta registrada'
+                    : 'Ofertas registradas: ' + candidate.offerIds.length
+                }}
+              </p>
+              <details>
+                <summary>Ver {{ candidate.evidencePaths.length }} rutas de evidencia</summary>
+                @for (path of candidate.evidencePaths; track $index) {
+                  <div class="path">
+                    <p>Ruta {{ $index + 1 }}</p>
+                    <ol>
+                      @for (node of path.nodes; track $index) {
+                        <li>
+                          @if ($index > 0) {
+                            <span class="relation">{{ path.relations[$index - 1] }} → </span>
+                          }
+                          <strong>{{ node.type }}</strong> {{ node.id }}
+                          @if (node.source) {
+                            <span class="source"> · {{ node.source }}</span>
+                          }
+                        </li>
+                      }
+                    </ol>
+                  </div>
+                }
+              </details>
+            </article>
+          }
+          <p class="fine-print">
+            La compatibilidad técnica y la disponibilidad son juicios distintos. La evidencia y los
+            precios del fixture son ficticios.
+          </p>
+        } @else {
+          <p class="notice">
+            Selecciona un escenario y ejecuta la evaluación para ver la decisión del servicio.
+          </p>
+        }
+      </section>
+    </div>
+  </main>
+</div>
