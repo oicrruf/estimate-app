@@ -1,0 +1,331 @@
+{
+  "cases": {
+    "changed": {
+      "changes": [
+        {
+          "change": "changed",
+          "key": "camera:camera"
+        },
+        {
+          "change": "changed",
+          "key": "camera:conduit"
+        },
+        {
+          "change": "changed",
+          "key": "camera:link"
+        },
+        {
+          "change": "changed",
+          "key": "camera:mount"
+        },
+        {
+          "change": "changed",
+          "key": "camera:termination"
+        }
+      ],
+      "checks": [],
+      "commercialReady": false,
+      "constraintReason": "document_missing",
+      "evidencePaths": [
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:conduit"
+        ],
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:link"
+        ],
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:mount"
+        ],
+        [
+          "camera:link",
+          "REQUIRES",
+          "camera:termination"
+        ]
+      ],
+      "intakeQuestions": [],
+      "lines": [
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:camera",
+          "quantity": 10,
+          "ruleId": null,
+          "sourceRefs": [],
+          "state": "user_requested",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "network:uplink",
+          "quantity": 1,
+          "ruleId": null,
+          "sourceRefs": [],
+          "state": "user_requested",
+          "unit": "port"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:conduit",
+          "quantity": 50,
+          "ruleId": "camera:camera-to-conduit",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-conduit"
+          ],
+          "state": "agent_proposed",
+          "unit": "m"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:link",
+          "quantity": 10,
+          "ruleId": "camera:camera-to-link",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-link"
+          ],
+          "state": "agent_proposed",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:mount",
+          "quantity": 10,
+          "ruleId": "camera:camera-to-mount",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-mount"
+          ],
+          "state": "agent_proposed",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:termination",
+          "quantity": 20,
+          "ruleId": "camera:link-to-termination",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:link-to-termination"
+          ],
+          "state": "agent_proposed",
+          "unit": "each"
+        }
+      ],
+      "persisted": false,
+      "reviewRequired": true,
+      "stage": "scope_review_pending",
+      "status": "pending_specialist"
+    },
+    "eight": {
+      "changes": [],
+      "checks": [
+        {
+          "id": "global:total-ports",
+          "status": "fail"
+        },
+        {
+          "id": "global:poe-ports",
+          "status": "pass"
+        }
+      ],
+      "commercialReady": false,
+      "constraintReason": null,
+      "evidencePaths": [
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:conduit"
+        ],
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:link"
+        ],
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:mount"
+        ],
+        [
+          "camera:link",
+          "REQUIRES",
+          "camera:termination"
+        ]
+      ],
+      "intakeQuestions": [],
+      "lines": [
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:camera",
+          "quantity": 8,
+          "ruleId": null,
+          "sourceRefs": [],
+          "state": "user_requested",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "network:uplink",
+          "quantity": 1,
+          "ruleId": null,
+          "sourceRefs": [],
+          "state": "user_requested",
+          "unit": "port"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:conduit",
+          "quantity": 40,
+          "ruleId": "camera:camera-to-conduit",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-conduit"
+          ],
+          "state": "agent_proposed",
+          "unit": "m"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:link",
+          "quantity": 8,
+          "ruleId": "camera:camera-to-link",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-link"
+          ],
+          "state": "agent_proposed",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:mount",
+          "quantity": 8,
+          "ruleId": "camera:camera-to-mount",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-mount"
+          ],
+          "state": "agent_proposed",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:termination",
+          "quantity": 16,
+          "ruleId": "camera:link-to-termination",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:link-to-termination"
+          ],
+          "state": "agent_proposed",
+          "unit": "each"
+        }
+      ],
+      "persisted": false,
+      "reviewRequired": true,
+      "stage": "scope_review_pending",
+      "status": "pending_specialist"
+    },
+    "missing": {
+      "changes": [],
+      "checks": [],
+      "commercialReady": false,
+      "constraintReason": "document_missing",
+      "evidencePaths": [
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:conduit"
+        ],
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:link"
+        ],
+        [
+          "camera:camera",
+          "REQUIRES",
+          "camera:mount"
+        ],
+        [
+          "camera:link",
+          "REQUIRES",
+          "camera:termination"
+        ]
+      ],
+      "intakeQuestions": [
+        "Confirm the PoE camera count with evidence.",
+        "Confirm the separate uplink port count with evidence."
+      ],
+      "lines": [
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:camera",
+          "quantity": null,
+          "ruleId": null,
+          "sourceRefs": [],
+          "state": "user_requested",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "network:uplink",
+          "quantity": null,
+          "ruleId": null,
+          "sourceRefs": [],
+          "state": "user_requested",
+          "unit": "port"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:conduit",
+          "quantity": null,
+          "ruleId": "camera:camera-to-conduit",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-conduit"
+          ],
+          "state": "pending_measurement",
+          "unit": "m"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:link",
+          "quantity": null,
+          "ruleId": "camera:camera-to-link",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-link"
+          ],
+          "state": "pending_measurement",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:mount",
+          "quantity": null,
+          "ruleId": "camera:camera-to-mount",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:camera-to-mount"
+          ],
+          "state": "pending_measurement",
+          "unit": "each"
+        },
+        {
+          "evidenceStatus": "unknown",
+          "key": "camera:termination",
+          "quantity": null,
+          "ruleId": "camera:link-to-termination",
+          "sourceRefs": [
+            "synthetic://at266/cameras/camera:link-to-termination"
+          ],
+          "state": "pending_measurement",
+          "unit": "each"
+        }
+      ],
+      "persisted": false,
+      "reviewRequired": true,
+      "stage": "scope_review_pending",
+      "status": "pending_specialist"
+    }
+  },
+  "sourceCommit": "fe9440727636c1b5c89d2f876fa7448a4d4816a7",
+  "synthetic": true,
+  "wireVersion": "at248.synthetic-review.v1"
+}
