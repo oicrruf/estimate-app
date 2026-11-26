@@ -1,8 +1,15 @@
 ## Linear / OpenSpec
 
-- Issue: AT-___
+- Issue: AT-XXX
 - OpenSpec change/archive:
 - Dependency on backend PR and canonical API export SHA:
+
+## Documentación
+
+- [ ] Actualicé este README o una guía enlazada en este mismo PR porque cambian comportamiento visible, comandos, configuración/entorno, contratos, pruebas o despliegue. Enlace:
+- [ ] No aplica actualizar documentación. Motivo:
+
+Marca una opción y completa el enlace o el motivo. Mantén el README como entrada y el detalle específico en su guía.
 
 ## Checks
 
