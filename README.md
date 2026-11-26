@@ -15,6 +15,11 @@ Open the local URL printed by Angular to see the workspace shell. The home page 
 
 The repository also contains a **local-only `/demo` prototype** that evaluates synthetic scenarios through a separately running local API. It is not a hosted feature. Follow the [local preview guide](docs/at-278-local-preview.md) for setup and limits; its recorded SHAs and test outcomes describe historical snapshots. Running `npm start` alone does not provide the demo's API responses.
 
+The [synthetic scope review preview](docs/at-248-local-review-preview.md) at
+`/demo/review` reads one pinned static fixture exported from the integrated API
+bridge. It distinguishes requested, proposed, and pending items and shows
+missing evidence. It performs no project mutation or approval.
+
 ## API contract
 
 `estimate-api` owns the canonical OpenAPI document. This repository tracks a copy in [`contracts/openapi.json`](contracts/openapi.json) and generates the typed client in [`src/app/api/health.generated.ts`](src/app/api/health.generated.ts). The integrated contract covers only `GET /health`; it does not provide project or quotation endpoints.

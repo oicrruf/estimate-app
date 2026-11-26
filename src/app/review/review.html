@@ -1,0 +1,76 @@
+<div class="review-page">
+  <header class="review-header">
+    <a class="brand" href="/" aria-label="Estimate Agent, volver al inicio">Estimate Agent</a>
+    <a href="/demo">Volver a la demo técnica</a>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p class="eyebrow">AT-248 · Vista local sintética</p>
+      <h1>Alcance pendiente de revisión</h1>
+      <p>Esta vista muestra una propuesta ficticia exportada del servicio local. No confirma,
+        guarda ni aprueba un proyecto, una compra o una instalación.</p>
+    </section>
+
+    @if (loading()) {
+      <p role="status">Cargando la fixture local…</p>
+    } @else if (error()) {
+      <p role="alert">La fixture local falta o no cumple el contrato esperado. No se muestra
+        ninguna propuesta.</p>
+    } @else if (current(); as review) {
+      <nav class="cases" aria-label="Casos sintéticos">
+        <button type="button" [attr.aria-pressed]="selected() === 'eight'" (click)="choose('eight')">8 PoE + uplink</button>
+        <button type="button" [attr.aria-pressed]="selected() === 'missing'" (click)="choose('missing')">Falta evidencia</button>
+        <button type="button" [attr.aria-pressed]="selected() === 'changed'" (click)="choose('changed')">Cambio a 10</button>
+      </nav>
+      <p class="notice" role="status">Revisión humana requerida · Estado {{ review.status }} ·
+        No persistido · Sin aprobación comercial</p>
+      <div class="grid">
+        <section class="panel" aria-labelledby="lines-title">
+          <h2 id="lines-title">Necesidades y candidatos</h2>
+          <ul class="lines">
+            @for (line of review.lines; track line.key) {
+              <li>
+                <span class="badge">{{ stateLabel(line.state) }}</span>
+                <strong>{{ line.key }}</strong>
+                <span>{{ line.quantity === null ? 'Cantidad pendiente' : line.quantity + ' ' + line.unit }}</span>
+                <small>Evidencia de capacidad: no disponible</small>
+                @if (line.ruleId) { <small>Regla: {{ line.ruleId }}</small> }
+              </li>
+            }
+          </ul>
+        </section>
+        <section class="panel" aria-labelledby="checks-title">
+          <h2 id="checks-title">Comprobaciones y faltantes</h2>
+          @if (review.constraintReason) {
+            <p>Comprobaciones pendientes: {{ review.constraintReason }}</p>
+          }
+          <ul>
+            @for (check of review.checks; track check.id) {
+              <li>{{ check.id }}: <strong>{{ check.status }}</strong></li>
+            }
+          </ul>
+          @for (question of review.intakeQuestions; track question) {
+            <p class="question">{{ question }}</p>
+          }
+          @if (review.changes.length) {
+            <h3>Cambios que requieren nueva revisión</h3>
+            <ul>
+              @for (change of review.changes; track change.key) {
+                <li>{{ change.key }}: {{ change.change }}</li>
+              }
+            </ul>
+          }
+          <details>
+            <summary>{{ review.evidencePaths.length }} rutas de dependencia sintética</summary>
+            <ul>
+              @for (path of review.evidencePaths; track $index) {
+                <li>{{ path[0] }} → {{ path[1] }} → {{ path[2] }}</li>
+              }
+            </ul>
+          </details>
+        </section>
+      </div>
+    }
+  </main>
+</div>
