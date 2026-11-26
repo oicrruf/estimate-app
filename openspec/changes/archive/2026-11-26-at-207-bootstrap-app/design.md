@@ -16,7 +16,7 @@ Se usa Angular standalone con TypeScript estricto. `a2ui/` expone una interfaz l
 
 ### Contrato cruzado
 
-La fuente canónica vive en `estimate-api` y exporta JSON OpenAPI 3.1 ordenado de forma determinista. Este repo guarda una referencia de esa exportación y un cliente TypeScript generado. `contract:check` compara el cliente regenerado con el archivo versionado y valida que el contrato tenga exactamente la ruta de salud acordada. CI del app descarga la rama backend AT-207, verifica su export contra el código FastAPI y compara el artefacto canónico con la referencia del app. El PR documenta la dependencia del PR backend y su SHA; al fusionar el backend se fija `develop` para el gate permanente. No se agregan rutas de dominio especulativas.
+La fuente canónica vive en `estimate-api` y exporta JSON OpenAPI 3.1 ordenado de forma determinista. Este repo guarda una referencia de esa exportación y un cliente TypeScript generado. `contract:check` compara el cliente regenerado con el archivo versionado y valida que el contrato tenga exactamente la ruta de salud acordada. CI del app descarga el commit inmutable backend AT-207, verifica su export contra el código FastAPI y compara por bytes el artefacto canónico con la referencia del app. El PR documenta la dependencia del PR backend y su SHA; al fusionar el backend se fija `develop` para el gate permanente. No se agregan rutas de dominio especulativas.
 
 ### Gates y riesgos
 

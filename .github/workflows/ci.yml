@@ -31,11 +31,15 @@ jobs:
       - name: Check canonical API export
         run: |
           git clone --depth 1 --branch feature/AT-207-api-bootstrap https://github.com/oicrruf/estimate-api.git /tmp/estimate-api-contract
+          git -C /tmp/estimate-api-contract fetch --depth 1 origin 4be76f2defe0d40b38ac5b8ed44cf52eb4e4e286
+          git -C /tmp/estimate-api-contract checkout --detach FETCH_HEAD
+          test "$(git -C /tmp/estimate-api-contract rev-parse HEAD)" = 4be76f2defe0d40b38ac5b8ed44cf52eb4e4e286
           python3 -m pip install uv==0.7.6
           cd /tmp/estimate-api-contract
           uv sync --frozen
           uv run --no-sync python scripts/openapi.py --check
           cd "$GITHUB_WORKSPACE"
+          cmp contracts/openapi.json /tmp/estimate-api-contract/contracts/openapi.json
           node scripts/generate-contract.mjs --check --api-export /tmp/estimate-api-contract/contracts/openapi.json
   secrets:
     runs-on: ubuntu-latest
