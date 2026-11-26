@@ -138,10 +138,14 @@ export function parseReviewFixture(value: unknown): ReviewFixture {
     line('eight', 'camera:camera')?.quantity !== 8 ||
     line('eight', 'network:uplink')?.quantity !== 1 ||
     line('eight', 'camera:link')?.state !== 'agent_proposed' ||
-    line('missing', 'camera:link')?.state !== 'pending_measurement' ||
-    line('missing', 'camera:link')?.quantity !== null ||
+    parsed.missing.checks.length !== 0 ||
+    parsed.missing.lines.some((item, index) =>
+      item.quantity !== null ||
+      item.state !== (index < 2 ? 'user_requested' : 'pending_measurement')
+    ) ||
     parsed.missing.constraintReason !== 'document_missing' ||
     line('changed', 'camera:camera')?.quantity !== 10 ||
+    parsed.changed.checks.length !== 0 ||
     parsed.changed.constraintReason !== 'document_missing' ||
     !parsed.changed.changes.some((item) => item.key === 'camera:link')
   ) invalid();

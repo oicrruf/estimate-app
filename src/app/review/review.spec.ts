@@ -53,6 +53,20 @@ describe('local synthetic scope review', () => {
     expect(() => parseReviewFixture(approval)).toThrow();
   });
 
+  it('rejects proposals and passing checks in the missing-evidence control', () => {
+    const proposed = structuredClone(sourceFixture);
+    const missingLine = proposed.cases.missing.lines[2] as { state: string; quantity: number | null };
+    missingLine.state = 'agent_proposed';
+    missingLine.quantity = 40;
+    expect(() => parseReviewFixture(proposed)).toThrow();
+
+    const checked = structuredClone(sourceFixture);
+    (checked.cases.missing.checks as { id: string; status: string }[]).push({
+      id: 'global:poe-ports', status: 'pass',
+    });
+    expect(() => parseReviewFixture(checked)).toThrow();
+  });
+
   it('fails closed when the static asset is unavailable', async () => {
     const fixture = TestBed.createComponent(ReviewPreview);
     fixture.detectChanges();
