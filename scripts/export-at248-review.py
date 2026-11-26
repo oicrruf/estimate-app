@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-API_COMMIT = "fe9440727636c1b5c89d2f876fa7448a4d4816a7"
+PINNED_API_REVISION = "fe9440727636c1b5c89d2f876fa7448a4d4816a7"
 OUTPUT = Path(__file__).resolve().parents[1] / "public/fixtures/at248-review.v1.json"
 CHECKS = {"global:total-ports", "global:poe-ports"}
 
@@ -58,7 +58,7 @@ def _case(result: Any) -> dict[str, Any]:
 
 
 def export(api_root: Path) -> bytes:
-    if _repo_stdout(api_root, "rev-parse", "HEAD") != API_COMMIT:
+    if _repo_stdout(api_root, "rev-parse", "HEAD") != PINNED_API_REVISION:
         raise ValueError("API checkout is not the pinned integrated commit")
     if _repo_stdout(api_root, "status", "--porcelain"):
         raise ValueError("API checkout must be clean")
@@ -98,7 +98,7 @@ def export(api_root: Path) -> bytes:
     value = {
         "wireVersion": "at248.synthetic-review.v1",
         "synthetic": True,
-        "sourceCommit": API_COMMIT,
+        "sourceCommit": PINNED_API_REVISION,
         "cases": {
             "eight": _case(eight),
             "missing": _case(missing),
