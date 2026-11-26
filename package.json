@@ -12,7 +12,7 @@
     "contract:check": "node scripts/generate-contract.mjs --check && node scripts/contract-test.mjs && node scripts/canonical-api-test.mjs",
     "openspec:check": "openspec validate --specs --strict && openspec validate --archived --strict",
     "check": "npm run lint && npm run typecheck && npm run test && npm run contract:check && npm run policy:check && npm run openspec:check && npm run build",
-    "policy:check": "node scripts/policy-test.mjs && node scripts/pr-head-test.mjs"
+    "policy:check": "node scripts/policy-test.mjs && node scripts/pr-head-test.mjs && node scripts/ci-phases-test.mjs"
   },
   "private": true,
   "packageManager": "npm@11.19.1",

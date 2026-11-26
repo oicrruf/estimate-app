@@ -1,0 +1,5 @@
+# Design
+
+Five named jobs run the same commands formerly in `verify`. Each job checks out the app, uses the existing Node `24.15.0`, and installs the lockfile with `npm ci`; setup-node's npm cache avoids repeated downloads. The contracts job runs both the local generated-client tests and the read-only canonical API lineage gate. The OpenSpec/metadata job keeps the PR-only title and exact-head identity check with full Git history. `secrets` and `dependency-review` keep their existing definitions.
+
+The protected `verify` job depends on all seven jobs and uses `if: ${{ always() }}`. Its single check parses the GitHub `needs` JSON, requires exactly the seven expected job IDs, and rejects any result other than `success`, including `failure`, `skipped`, `cancelled`, missing, or unknown. If the whole workflow is canceled before `verify` can run, the required context cannot become green. A local synthetic test checks every status for every dependency. Branch protection settings are not changed.
