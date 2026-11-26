@@ -1,0 +1,4 @@
+# AT-248: the scanner classified the public API commit SHA as a generic API key.
+# Ignore only these two reviewed historical findings; retain all other rules.
+2f48d5b994ee6dbd8e160212b42f97e5623b335b:scripts/export-at248-review.py:generic-api-key:12
+773cb2ebc85ec65c1967c6276a1f80f1c0628187:scripts/export-at248-review.py:generic-api-key:12
