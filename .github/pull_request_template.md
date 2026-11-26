@@ -4,12 +4,12 @@
 - OpenSpec change/archive:
 - Dependency on backend PR and canonical API export SHA:
 
-## Documentación
+## Documentation for judges
 
-- [ ] Actualicé este README o una guía enlazada en este mismo PR porque cambian comportamiento visible, comandos, configuración/entorno, contratos, pruebas o despliegue. Enlace:
-- [ ] No aplica actualizar documentación. Motivo:
+- [ ] I updated the root README or a guide linked from it in this PR because visible behavior, commands, configuration/environment, contracts, tests, or deployment changed. Link:
+- [ ] No documentation update applies. Reason:
 
-Marca una opción y completa el enlace o el motivo. Mantén el README como entrada y el detalle específico en su guía.
+Select one option and provide the link or reason. Keep the root README and essential judge-facing instructions in English; put issue-specific details in linked guides.
 
 ## Checks
 

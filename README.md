@@ -1,32 +1,32 @@
 # Estimate App
 
-Frontend Angular de Estimate Agent. La ruta principal muestra un espacio de trabajo inicial, adaptable y accesible, todavía sin proyectos ni datos conectados. El límite A2UI presente usa una fuente vacía; no hay asistente conversacional, autenticación ni flujo de cotización para usuarios. La arquitectura está descrita en el [ADR 0001 del API](https://github.com/oicrruf/estimate-api/blob/develop/docs/adr/0001-arquitectura-inicial.md).
+Estimate Agent's Angular frontend currently opens to an accessible, responsive workspace shell with no connected projects or data. The A2UI boundary has an empty message source. Conversational assistance, sign-in, and quoting workflows are not available in this app. The [API architecture decision record](https://github.com/oicrruf/estimate-api/blob/develop/docs/adr/0001-arquitectura-inicial.md) describes the wider design.
 
-## Desarrollo local
+## Try what exists today
 
-Usa Node 24.15.0 (o una versión compatible de Node 24) y npm 11.19.1. Desde la raíz del repositorio:
+Use Node 24.15.0 (or a compatible Node 24 release) and npm 11.19.1. From the repository root:
 
 ```sh
 npm ci
 npm start
 ```
 
-`npm start` inicia el servidor de desarrollo Angular. Abre la URL local que indique el comando para ver la portada. No necesitas una cuenta ni claves para esa vista. No guardes secretos de runtime ni claves privilegiadas en este repositorio público.
+Open the local URL printed by Angular to see the workspace shell. The home page needs no account, API service, or credentials. To run the full local check suite, use `npm run check` as described below.
 
-La ruta `/demo` es una **prueba local con datos ficticios**, integrada para evaluar la interfaz con un servicio API local. No es una funcionalidad publicada ni funciona como demo conectado en un build estático por sí solo. Los pasos, el proxy local y los límites están en la [guía de la vista sintética](docs/at-278-local-preview.md); sus SHA y resultados de prueba describen snapshots históricos.
+The repository also contains a **local-only `/demo` prototype** that evaluates synthetic scenarios through a separately running local API. It is not a hosted feature. Follow the [local preview guide](docs/at-278-local-preview.md) for setup and limits; its recorded SHAs and test outcomes describe historical snapshots. Running `npm start` alone does not provide the demo's API responses.
 
-## Contrato con el API
+## API contract
 
-`estimate-api` mantiene el OpenAPI canónico. Este repositorio conserva una copia en [`contracts/openapi.json`](contracts/openapi.json) y genera el cliente tipado en [`src/app/api/health.generated.ts`](src/app/api/health.generated.ts). El contrato integrado aquí cubre únicamente `GET /health`; no implica endpoints de proyectos o cotizaciones.
+`estimate-api` owns the canonical OpenAPI document. This repository tracks a copy in [`contracts/openapi.json`](contracts/openapi.json) and generates the typed client in [`src/app/api/health.generated.ts`](src/app/api/health.generated.ts). The integrated contract covers only `GET /health`; it does not provide project or quotation endpoints.
 
-El [check canónico](scripts/check-canonical-api.mjs) consulta `estimate-api/develop`, comprueba que descienda del commit aprobado fijado en ese script y compara los bytes del OpenAPI actual con los del commit aprobado y la copia de esta app. También comprueba el cliente generado. **No exige que `develop` permanezca en el SHA fijado:** un descendiente con contrato idéntico pasa; un cambio de contrato requiere revisión y actualización coordinada. La CI del API verifica por separado que su artifact corresponda al export de FastAPI. Sigue el [procedimiento de sincronización](docs/contract-sync.md) cuando el contrato cambie; el README no duplica el SHA, que puede avanzar.
+The [canonical check](scripts/check-canonical-api.mjs) fetches `estimate-api/develop`, confirms that it descends from the approved commit pinned in that script, and compares the current OpenAPI bytes with both the approved commit and this app's copy. It checks the generated client too. **The live `develop` HEAD need not equal the pin:** a descendant with identical contract bytes passes; a contract change needs a reviewed, coordinated update. API CI separately verifies that its tracked document matches FastAPI's export. Follow the [contract synchronization procedure](docs/contract-sync.md) when the contract changes; the approved reference and its update steps belong in that guide and the check, not in this README.
 
-## Verificación y contribución
+## Verify and contribute
 
 ```sh
 npm run check
 ```
 
-El comando ejecuta lint, tipos, pruebas unitarias, pruebas del contrato y de políticas, validación estricta de OpenSpec y build. La [guía de fases de CI](docs/ci-phases.md) indica qué comprueba cada job y cómo `verify` reúne sus resultados. La CI también ejecuta el check canónico vivo, el escaneo de secretos y la revisión de dependencias. Estas comprobaciones no despliegan la app.
+This runs lint, type checks, unit tests, contract and policy tests, strict OpenSpec validation, and a production build. The [CI phase guide](docs/ci-phases.md) explains each job and how `verify` combines their results. CI also runs the live canonical API check, secret scanning, and dependency review. These checks do not deploy the app.
 
-Para cambios de comportamiento, sigue OpenSpec: propuesta, especificación y diseño, tareas, implementación, verificación y archivo. Consulta [AGENTS.md](AGENTS.md) y la [plantilla de PR](.github/pull_request_template.md). Cada PR debe actualizar este README o una guía enlazada cuando cambie el comportamiento visible, los comandos, la configuración, el contrato, las pruebas o el despliegue; si no aplica, explica el motivo en el PR. El README es la entrada y las guías conservan el detalle.
+For behavior changes, follow the OpenSpec sequence: proposal, specification and design, tasks, implementation, verification, and archive. See [AGENTS.md](AGENTS.md) and the [pull request template](.github/pull_request_template.md). In the same PR, update this README or a linked guide when visible behavior, commands, configuration, contracts, tests, or deployment change. If none apply, explain why in the PR. Keep this README as the entry point and the detailed procedures in their guides.
