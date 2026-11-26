@@ -32,7 +32,7 @@ jobs:
       - name: Check canonical API export
         run: |
           git clone --depth 1 --branch develop https://github.com/oicrruf/estimate-api.git /tmp/estimate-api-contract
-          test "$(git -C /tmp/estimate-api-contract rev-parse HEAD)" = 6ecc9a9c5d6ba6355e3332f8b6533c81ed878b74
+          test "$(git -C /tmp/estimate-api-contract rev-parse HEAD)" = 9f745b92bbfd2ee987471164a2e97c1ee2a87206
           python3 -m pip install uv==0.7.6
           cd /tmp/estimate-api-contract
           uv sync --frozen
