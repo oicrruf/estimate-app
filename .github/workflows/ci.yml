@@ -9,7 +9,44 @@ on:
 permissions:
   contents: read
 jobs:
-  verify:
+  angular-quality:
+    name: angular-quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+  angular-tests:
+    name: angular-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run test
+  contracts:
+    name: contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run contract:check
+      - name: Check canonical API export
+        run: node scripts/check-canonical-api.mjs
+  openspec-metadata:
+    name: openspec-metadata
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +57,8 @@ jobs:
           node-version: '24.15.0'
           cache: npm
       - run: npm ci
-      - run: npm run check
+      - run: npm run policy:check
+      - run: npm run openspec:check
       - name: Validate PR title and commit identity
         if: github.event_name == 'pull_request'
         env:
@@ -29,8 +67,17 @@ jobs:
         run: |
           git fetch --no-tags origin "$PR_HEAD_SHA"
           node scripts/check-pr-head.mjs "$PR_TITLE" "$GITHUB_HEAD_REF" "$PR_HEAD_SHA"
-      - name: Check canonical API export
-        run: node scripts/check-canonical-api.mjs
+  production-build:
+    name: production-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
   secrets:
     runs-on: ubuntu-latest
     steps:
@@ -50,3 +97,24 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm audit --audit-level=high
+  verify:
+    name: verify
+    if: ${{ always() }}
+    needs:
+      - angular-quality
+      - angular-tests
+      - contracts
+      - openspec-metadata
+      - production-build
+      - secrets
+      - dependency-review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+      - name: Require every CI phase to succeed
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: node scripts/check-ci-phases.mjs
