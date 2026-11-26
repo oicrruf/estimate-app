@@ -30,16 +30,7 @@ jobs:
           git fetch --no-tags origin "$PR_HEAD_SHA"
           node scripts/check-pr-head.mjs "$PR_TITLE" "$GITHUB_HEAD_REF" "$PR_HEAD_SHA"
       - name: Check canonical API export
-        run: |
-          git clone --depth 1 --branch develop https://github.com/oicrruf/estimate-api.git /tmp/estimate-api-contract
-          test "$(git -C /tmp/estimate-api-contract rev-parse HEAD)" = 6ecc9a9c5d6ba6355e3332f8b6533c81ed878b74
-          python3 -m pip install uv==0.7.6
-          cd /tmp/estimate-api-contract
-          uv sync --frozen
-          uv run --no-sync python scripts/openapi.py --check
-          cd "$GITHUB_WORKSPACE"
-          cmp contracts/openapi.json /tmp/estimate-api-contract/contracts/openapi.json
-          node scripts/generate-contract.mjs --check --api-export /tmp/estimate-api-contract/contracts/openapi.json
+        run: node scripts/check-canonical-api.mjs
   secrets:
     runs-on: ubuntu-latest
     steps:
