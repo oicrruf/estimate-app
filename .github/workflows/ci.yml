@@ -1,0 +1,54 @@
+name: App CI
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Validate PR title and commit identity
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          author="$(git log -1 --format='%an <%ae>')"
+          body="$(git log -1 --format='%B')"
+          node scripts/check-policy.mjs "$PR_TITLE" "$author" "$body" "$GITHUB_HEAD_REF"
+      - name: Check canonical API export
+        run: |
+          git clone --depth 1 --branch feature/AT-207-api-bootstrap https://github.com/oicrruf/estimate-api.git /tmp/estimate-api-contract
+          python3 -m pip install uv==0.7.6
+          cd /tmp/estimate-api-contract
+          uv sync --frozen
+          uv run --no-sync python scripts/openapi.py --check
+          cd "$GITHUB_WORKSPACE"
+          node scripts/generate-contract.mjs --check --api-export /tmp/estimate-api-contract/contracts/openapi.json
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
