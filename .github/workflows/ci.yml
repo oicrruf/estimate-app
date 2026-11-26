@@ -1,6 +1,7 @@
 name: App CI
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
     branches: [develop, main]
   push:
     branches: [develop, main]
@@ -24,10 +25,10 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          author="$(git log -1 --format='%an <%ae>')"
-          body="$(git log -1 --format='%B')"
-          node scripts/check-policy.mjs "$PR_TITLE" "$author" "$body" "$GITHUB_HEAD_REF"
+          git fetch --no-tags origin "$PR_HEAD_SHA"
+          node scripts/check-pr-head.mjs "$PR_TITLE" "$GITHUB_HEAD_REF" "$PR_HEAD_SHA"
       - name: Check canonical API export
         run: |
           git clone --depth 1 --branch feature/AT-207-api-bootstrap https://github.com/oicrruf/estimate-api.git /tmp/estimate-api-contract
