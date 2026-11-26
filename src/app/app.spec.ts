@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { App } from './app';
+import { Home } from './app';
 
 describe('App', () => {
   it('renders a safe empty workspace', async () => {
-    await TestBed.configureTestingModule({ imports: [App] }).compileComponents();
-    const fixture = TestBed.createComponent(App);
+    await TestBed.configureTestingModule({ imports: [Home] }).compileComponents();
+    const fixture = TestBed.createComponent(Home);
     await fixture.whenStable();
     const page = fixture.nativeElement as HTMLElement;
     expect(page.querySelector('h1')?.textContent).toContain('De una idea');
