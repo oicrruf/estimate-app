@@ -26,6 +26,8 @@ missing evidence. It performs no project mutation or approval.
 
 The [canonical check](scripts/check-canonical-api.mjs) fetches `estimate-api/develop`, confirms that it descends from the approved commit pinned in that script, and compares the current OpenAPI bytes with both the approved commit and this app's copy. It checks the generated client too. **The live `develop` HEAD need not equal the pin:** a descendant with identical contract bytes passes; a contract change needs a reviewed, coordinated update. API CI separately verifies that its tracked document matches FastAPI's export. Follow the [contract synchronization procedure](docs/contract-sync.md) when the contract changes; the approved reference and its update steps belong in that guide and the check, not in this README.
 
+A separate [intake preview contract guide](docs/intake-preview-contract.md) explains the draft, read-only client and its pinned public fixture. The preview is not wired to the app; its check runs after the canonical contract checks without advancing their approved reference.
+
 ## Verify and contribute
 
 ```sh

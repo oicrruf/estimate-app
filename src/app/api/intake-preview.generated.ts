@@ -627,7 +627,11 @@ function valid(schema: Schema, value: unknown): boolean {
   if (schema.const !== undefined && value !== schema.const) return false;
   if (schema.enum && !schema.enum.includes(value)) return false;
   if (schema.type === 'null') return value === null;
-  if (schema.type === 'string') return typeof value === 'string' && (schema.minLength === undefined || value.length >= schema.minLength) && (schema.maxLength === undefined || value.length <= schema.maxLength);
+  if (schema.type === 'string') {
+    if (typeof value !== 'string') return false;
+    const length = [...value].length;
+    return (schema.minLength === undefined || length >= schema.minLength) && (schema.maxLength === undefined || length <= schema.maxLength);
+  }
   if (schema.type === 'number') return typeof value === 'number' && Number.isFinite(value);
   if (schema.type === 'boolean') return typeof value === 'boolean';
   if (schema.type === 'array') return Array.isArray(value) && (schema.items === undefined || value.every((item) => valid(schema.items!, item)));
@@ -641,6 +645,21 @@ function valid(schema: Schema, value: unknown): boolean {
   return false;
 }
 
+function omitOptionalUndefined(schema: Schema, value: unknown): unknown {
+  if (schema.$ref) {
+    const name = schema.$ref.replace('#/components/schemas/', '');
+    return schemas[name] ? omitOptionalUndefined(schemas[name], value) : value;
+  }
+  if (schema.anyOf) {
+    const branch = schema.anyOf.find((item) => value === null ? item.type === 'null' : item.type !== 'null');
+    return branch ? omitOptionalUndefined(branch, value) : value;
+  }
+  if (schema.type === 'array' && Array.isArray(value) && schema.items) return value.map((item) => omitOptionalUndefined(schema.items!, item));
+  if (schema.type !== 'object' || value === null || typeof value !== 'object' || Array.isArray(value)) return value;
+  const input = value as Record<string, unknown>;
+  return Object.fromEntries(Object.entries(input).filter(([key, item]) => item !== undefined || !schema.properties?.[key] || schema.required?.includes(key)).map(([key, item]) => [key, schema.properties?.[key] ? omitOptionalUndefined(schema.properties[key], item) : item]));
+}
+
 export function parseIntakePreview(value: unknown): IntakePreviewResponse {
   if (!valid(schemas['IntakePreviewResponse'], value)) throw new Error('Invalid intake preview response');
   const response = value as IntakePreviewResponse;
@@ -649,7 +668,7 @@ export function parseIntakePreview(value: unknown): IntakePreviewResponse {
 }
 
 export async function previewChatIntake(baseUrl: string, intake: Intake, fetcher: typeof fetch = fetch): Promise<IntakePreviewResponse> {
-  const request: IntakePreviewRequest = { operation: 'create_project', intake };
+  const request = omitOptionalUndefined(schemas['IntakePreviewRequest'], { operation: 'create_project', intake }) as IntakePreviewRequest;
   if (!valid(schemas['IntakePreviewRequest'], request)) throw new Error('Invalid intake preview request');
   const response = await fetcher(new URL('/v1/chat/intake-preview', baseUrl), { method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'omit', body: JSON.stringify(request) });
   if (!response.ok) throw new Error('Intake preview failed: ' + response.status);
