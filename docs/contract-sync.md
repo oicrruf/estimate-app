@@ -1,6 +1,6 @@
 # Coupled API contract update
 
-The API `develop` branch owns the canonical deterministic OpenAPI artifact. The app tracks its exact bytes and generated TypeScript clients. The current approved app pair uses API commit `248ca4b69eb135ebff0b80fa61fb55598ba0bbb6` and SHA-256 `86b72b468097253a178c8cf33d09f6ef2b10196943b46a623fca2eea0436ac06` for `contracts/openapi.json`. It contains `GET /health` and `POST /v1/chat/intake-preview`.
+The API `develop` branch owns the canonical deterministic OpenAPI artifact. The app tracks its exact bytes and generated TypeScript clients. The current approved app pair uses API commit `a2b8d9795b73c2e91a1c54029789fd85bbd76fb5` and SHA-256 `0f13af69dfac409072b66a3d75e940c9bc7ea9970ac5788c0fbf1cc1edd8bcf9` for `contracts/openapi.json`. It contains five operations: health, intake preview, authenticated project list/read, and authenticated project scope-review preview. The latter three are not wired to an app route.
 
 ## CI provenance gate
 
@@ -19,6 +19,6 @@ The AT-207 bootstrap contract contains only OpenAPI 3.1, info version `0.1.0`, a
 
 ## AT-237 transition
 
-The reviewed intake preview fixture now matches the approved two-route artifact byte for byte. The health generator accepts either the historical AT-207 health-only shape or the current shape with the reviewed `POST /v1/chat/intake-preview` operation; it does not advance the canonical SHA or admit a different operation. The synthetic lineage test checks both the old-pin rejection and the preview-pin acceptance in either phase. The generated preview validator requires own schema and value properties and rejects inherited object properties.
+The reviewed intake preview fixture preserves the historical two-route artifact. The health generator accepts only that exact artifact or the integrated five-route artifact; it does not advance the canonical SHA or admit a different operation. The two-phase test keeps the historical fixture separate after the canonical copy advances. The synthetic lineage test checks old-pin rejection and reviewed-preview acceptance. The generated intake validator requires own schema and value properties and rejects inherited object properties.
 
-API PR #37 was integrated at the commit recorded above. This app PR copied its tracked artifact and advanced `APPROVED_SHA` together, keeping the canonical remote fixed. For a future contract change, follow the intentional update steps above; never use a local rehearsal SHA as the approved pin.
+API PR #37 previously integrated the two-route artifact at `248ca4b69eb135ebff0b80fa61fb55598ba0bbb6`. API PR #39 integrated the current five-route artifact at the commit recorded above. The app copied each tracked artifact and advanced `APPROVED_SHA` only after its API merge, keeping the canonical remote fixed. For a future contract change, follow the intentional update steps above; never use a local rehearsal SHA as the approved pin.
