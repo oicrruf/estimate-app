@@ -7,7 +7,7 @@ import { join, resolve } from 'node:path';
 
 const originalScript = readFileSync(resolve('scripts/generate-contract.mjs'), 'utf8');
 const generatedHealth = readFileSync(resolve('src/app/api/health.generated.ts'));
-const current = readFileSync(resolve('contracts/openapi.json'));
+const twoRoute = readFileSync(resolve('tests/fixtures/at237-preview-openapi.json'));
 const reviewedFive = readFileSync(resolve('tests/fixtures/at209-scope-review-openapi.json'));
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const dir = mkdtempSync(join(tmpdir(), 'estimate-contract-phases-'));
@@ -20,7 +20,7 @@ function check(bytes, phase, expectedError) {
   writeFileSync(source, bytes);
   let script = originalScript;
   if (phase) {
-    const reviewedHash = phase === 'current' ? hash(current) : hash(reviewedFive);
+    const reviewedHash = phase === 'two-route' ? hash(twoRoute) : hash(reviewedFive);
     assert.equal(script.split(reviewedHash).length, 2);
     script = script.replace(reviewedHash, hash(bytes));
   }
@@ -42,11 +42,11 @@ function changed(bytes, mutate) {
 }
 
 try {
-  check(current);
+  check(twoRoute);
   check(reviewedFive);
-  check(changed(current, (spec) => { spec.paths['/health'].get.operationId = 'changed'; }), 'current', 'frozen health');
-  check(changed(current, (spec) => { spec.paths['/v1/chat/intake-preview'].post.operationId = 'changed'; }), 'current', 'deterministic intake');
-  check(changed(current, (spec) => { spec.components.schemas.IntakePayload.properties.description.type = 'number'; }), 'current', 'frozen health and intake schemas');
+  check(changed(twoRoute, (spec) => { spec.paths['/health'].get.operationId = 'changed'; }), 'two-route', 'frozen health');
+  check(changed(twoRoute, (spec) => { spec.paths['/v1/chat/intake-preview'].post.operationId = 'changed'; }), 'two-route', 'deterministic intake');
+  check(changed(twoRoute, (spec) => { spec.components.schemas.IntakePayload.properties.description.type = 'number'; }), 'two-route', 'frozen health and intake schemas');
   check(changed(reviewedFive, (spec) => { spec.paths['/health'].get.operationId = 'changed'; }), 'reviewed-five', 'frozen health');
   check(changed(reviewedFive, (spec) => { spec.components.schemas.IntakePayload.properties.description.type = 'number'; }), 'reviewed-five', 'frozen health and intake schemas');
   check(changed(reviewedFive, (spec) => { spec.paths['/projects'].get.operationId = 'changed'; }), 'reviewed-five', 'project list');

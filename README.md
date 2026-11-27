@@ -22,11 +22,11 @@ missing evidence. It performs no project mutation or approval.
 
 ## API contract
 
-`estimate-api` owns the canonical OpenAPI document. This repository tracks a copy in [`contracts/openapi.json`](contracts/openapi.json) and checks typed clients for `GET /health` and the separate, unconnected `POST /v1/chat/intake-preview` client. The integrated contract does not provide an authenticated project scope review or quotation flow in this app.
+`estimate-api` owns the canonical OpenAPI document. This repository tracks a copy in [`contracts/openapi.json`](contracts/openapi.json). It now describes health, intake preview, authenticated project list/read, and project scope-review preview operations. The typed intake and scope-review clients are not connected to app routes; this app does not provide sign-in, a live project flow, or quoting.
 
 The [canonical check](scripts/check-canonical-api.mjs) fetches `estimate-api/develop`, confirms that it descends from the approved commit pinned in that script, and compares the current OpenAPI bytes with both the approved commit and this app's copy. It checks the generated client too. **The live `develop` HEAD need not equal the pin:** a descendant with identical contract bytes passes; a contract change needs a reviewed, coordinated update. API CI separately verifies that its tracked document matches FastAPI's export. Follow the [contract synchronization procedure](docs/contract-sync.md) when the contract changes; the approved reference and its update steps belong in that guide and the check, not in this README.
 
-The [intake preview contract guide](docs/intake-preview-contract.md) explains its client and reviewed public fixture. A separate [authenticated scope review draft guide](docs/at-209-scope-review-contract.md) covers the pinned API PR #39 contract and its disabled integration boundary. Neither client is wired to a visible app route; the draft check does not advance the canonical reference.
+The [intake preview contract guide](docs/intake-preview-contract.md) explains its client and reviewed public fixture. The [authenticated scope review contract guide](docs/at-209-scope-review-contract.md) records the integrated API #39 reference and its disabled app integration boundary. Neither client is wired to a visible app route.
 
 ## Verify and contribute
 
