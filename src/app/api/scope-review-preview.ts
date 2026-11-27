@@ -70,7 +70,7 @@ export function parseScopeReviewPreview(value: unknown, projectId: string): Scop
     data['projectId'].toLowerCase() !== projectId.toLowerCase() ||
     data['state'] !== 'pending_review' ||
     !Number.isSafeInteger(data['requestedQuantity']) || (data['requestedQuantity'] as number) < 1 ||
-    typeof data['question'] !== 'string' || [...data['question']].length < 1 ||
+    typeof data['question'] !== 'string' || !data['question'].trim() ||
     !Array.isArray(data['evidenceIds']) ||
     !data['evidenceIds'].every((id: unknown) => typeof id === 'string') ||
     (proposal['status'] !== 'insufficient_stock' && proposal['status'] !== 'needs_review') ||

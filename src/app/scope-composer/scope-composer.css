@@ -1,0 +1,12 @@
+.scope-composer { flex: 1; min-width: 0; padding: 24px; }
+.scope-composer h2 { margin: 0 0 8px; }
+.scope-note { color: #64776d; line-height: 1.5; }
+form { display: grid; gap: 10px; }
+label { font-size: 13px; font-weight: 650; }
+textarea { width: 100%; min-width: 0; resize: vertical; border: 1px solid #a9bdb1; border-radius: 10px; padding: 12px; font: inherit; }
+button { min-height: 44px; border: 0; border-radius: 10px; padding: 10px 16px; background: #236a58; color: white; font: inherit; font-weight: 650; cursor: pointer; }
+button:disabled { background: #b7c5bc; cursor: not-allowed; }
+.access { margin-top: 12px; }
+button:focus-visible, textarea:focus-visible { outline: 3px solid #37745d; outline-offset: 2px; }
+.result { overflow-wrap: anywhere; border-top: 1px solid #e2e9e1; margin-top: 20px; padding-top: 12px; }
+.result ul { padding-left: 20px; }

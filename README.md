@@ -26,7 +26,9 @@ missing evidence. It performs no project mutation or approval.
 
 The [canonical check](scripts/check-canonical-api.mjs) fetches `estimate-api/develop`, confirms that it descends from the approved commit pinned in that script, and compares the current OpenAPI bytes with both the approved commit and this app's copy. It checks the generated client too. **The live `develop` HEAD need not equal the pin:** a descendant with identical contract bytes passes; a contract change needs a reviewed, coordinated update. API CI separately verifies that its tracked document matches FastAPI's export. Follow the [contract synchronization procedure](docs/contract-sync.md) when the contract changes; the approved reference and its update steps belong in that guide and the check, not in this README.
 
-The [intake preview contract guide](docs/intake-preview-contract.md) explains its client and reviewed public fixture. The [authenticated scope review contract guide](docs/at-209-scope-review-contract.md) records the integrated API #39 reference and its disabled app integration boundary. Neither client is wired to a visible app route.
+The [intake preview contract guide](docs/intake-preview-contract.md) explains its client and reviewed public fixture. The [authenticated scope review contract guide](docs/at-209-scope-review-contract.md) records the integrated API #39 reference and its disabled app integration boundary. The intake client is not wired to a visible app route.
+
+The home workspace includes a local scope composer integration that is **disabled by default**: the app supplies no authenticated project session adapter, so the existing empty state stays visible and no preview call is made. The linked scope review guide explains the synthetic tests and the exact auth wiring still required.
 
 ## Verify and contribute
 
