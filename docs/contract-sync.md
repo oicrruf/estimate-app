@@ -16,3 +16,9 @@ Run `node scripts/check-canonical-api.mjs` to check the live canonical ref. `npm
 4. Merge the app only after its CI fetches current canonical `develop`, proves ancestry and byte agreement, and passes the generated-client check. If API `develop` moves without changing OpenAPI bytes, the gate continues to pass; if the bytes change, stop for a coordinated contract update.
 
 The AT-207 bootstrap contract contains only OpenAPI 3.1, info version `0.1.0`, and `GET /health`. Add no domain endpoints without their owning issue and reviewed cross-repo spec. Never copy secrets or private fixtures into either public repository.
+
+## AT-237 transition
+
+The reviewed intake preview fixture is separate from the currently approved health-only artifact. The health generator accepts either the health-only shape or that shape plus the reviewed `POST /v1/chat/intake-preview` operation; it does not advance the canonical SHA or admit a different operation. The synthetic lineage test checks both the old-pin rejection and the preview-pin acceptance in either phase. The generated preview validator requires own schema and value properties and rejects inherited object properties.
+
+After API PR #37 is integrated, verify its actual `develop` commit and deterministic OpenAPI bytes. In a coordinated app follow-up, copy that tracked artifact, advance `APPROVED_SHA` to the integrated commit, and keep the canonical remote fixed. Run `npm run contract:generate`, `npm run check`, and `node scripts/check-canonical-api.mjs` before requesting review of the new app head. Do not use the local rehearsal SHA as the approved pin.

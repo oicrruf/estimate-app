@@ -30,6 +30,7 @@ const generated = `// Generated from the public PR #37 OpenAPI artifact. Do not 
 const schemas: Record<string, Schema> = ${JSON.stringify(schemas, null, 2)};
 
 type Schema = { [key: string]: unknown; $ref?: string; anyOf?: Schema[]; type?: string; enum?: unknown[]; const?: unknown; properties?: Record<string, Schema>; required?: string[]; additionalProperties?: boolean; items?: Schema; minLength?: number; maxLength?: number };
+const own = (value: object, key: PropertyKey): boolean => Object.prototype.hasOwnProperty.call(value, key);
 export type Certainty = 'confirmed' | 'inferred';
 export type Fact<T> = { value: T; certainty: Certainty; evidence?: string | null };
 export type Measurement = { label: string; value: number; unit: string };
@@ -44,7 +45,7 @@ export type IntakePreviewResponse = { draft: ScopeDraft; proposed_purchase_items
 function valid(schema: Schema, value: unknown): boolean {
   if (schema.$ref) {
     const name = schema.$ref.replace('#/components/schemas/', '');
-    return schema.$ref === '#/components/schemas/' + name && schemas[name] !== undefined && valid(schemas[name], value);
+    return schema.$ref === '#/components/schemas/' + name && own(schemas, name) && valid(schemas[name], value);
   }
   if (schema.anyOf) return schema.anyOf.some((branch) => valid(branch, value));
   if (schema.const !== undefined && value !== schema.const) return false;
@@ -61,9 +62,11 @@ function valid(schema: Schema, value: unknown): boolean {
   if (schema.type === 'object') {
     if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
     const obj = value as Record<string, unknown>;
-    if (schema.required?.some((key) => !(key in obj))) return false;
-    if (schema.additionalProperties === false && Object.keys(obj).some((key) => !(key in (schema.properties ?? {})))) return false;
-    return Object.entries(obj).every(([key, item]) => !schema.properties?.[key] || valid(schema.properties[key], item));
+    if (Object.getPrototypeOf(obj) !== Object.prototype && Object.getPrototypeOf(obj) !== null) return false;
+    const properties = schema.properties ?? {};
+    if (schema.required?.some((key) => !own(obj, key) || !own(properties, key))) return false;
+    if (schema.additionalProperties === false && Object.keys(obj).some((key) => !own(properties, key))) return false;
+    return Object.entries(obj).every(([key, item]) => !own(properties, key) || valid(properties[key], item));
   }
   return false;
 }
@@ -71,7 +74,7 @@ function valid(schema: Schema, value: unknown): boolean {
 function omitOptionalUndefined(schema: Schema, value: unknown): unknown {
   if (schema.$ref) {
     const name = schema.$ref.replace('#/components/schemas/', '');
-    return schemas[name] ? omitOptionalUndefined(schemas[name], value) : value;
+    return own(schemas, name) ? omitOptionalUndefined(schemas[name], value) : value;
   }
   if (schema.anyOf) {
     const branch = schema.anyOf.find((item) => value === null ? item.type === 'null' : item.type !== 'null');
@@ -79,8 +82,10 @@ function omitOptionalUndefined(schema: Schema, value: unknown): unknown {
   }
   if (schema.type === 'array' && Array.isArray(value) && schema.items) return value.map((item) => omitOptionalUndefined(schema.items!, item));
   if (schema.type !== 'object' || value === null || typeof value !== 'object' || Array.isArray(value)) return value;
+  if (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) return value;
   const input = value as Record<string, unknown>;
-  return Object.fromEntries(Object.entries(input).filter(([key, item]) => item !== undefined || !schema.properties?.[key] || schema.required?.includes(key)).map(([key, item]) => [key, schema.properties?.[key] ? omitOptionalUndefined(schema.properties[key], item) : item]));
+  const properties = schema.properties ?? {};
+  return Object.fromEntries(Object.entries(input).filter(([key, item]) => item !== undefined || !own(properties, key) || schema.required?.includes(key)).map(([key, item]) => [key, own(properties, key) ? omitOptionalUndefined(properties[key], item) : item]));
 }
 
 export function parseIntakePreview(value: unknown): IntakePreviewResponse {

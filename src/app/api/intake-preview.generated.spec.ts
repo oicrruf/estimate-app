@@ -28,6 +28,23 @@ describe('generated read-only intake preview', () => {
     ).toThrow();
   });
 
+  it('rejects inherited required values and inherited unrecognized properties', async () => {
+    const inheritedDraft = Object.assign(Object.create({ description: 'Inherited' }), {
+      contract_version: 'intake.v1',
+      blocking_questions: [],
+    });
+    expect(() => parseIntakePreview({ ...safe, draft: inheritedDraft })).toThrow();
+    const inheritedExtra = Object.assign(Object.create({ extra: 'unrecognized' }), safe);
+    expect(() => parseIntakePreview(inheritedExtra)).toThrow();
+
+    const fetcher = vi.fn();
+    const inheritedRequest = Object.assign(Object.create({ extra: 'unrecognized' }), {
+      description: 'Synthetic request',
+    }) as Intake;
+    await expect(previewChatIntake('http://127.0.0.1:8000', inheritedRequest, fetcher as typeof fetch)).rejects.toThrow();
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
   it('posts only a validated synthetic intake and omits credentials', async () => {
     const fetcher = vi.fn(
       async (_url: URL, _init?: RequestInit) => new Response(JSON.stringify(safe), { status: 200 }),

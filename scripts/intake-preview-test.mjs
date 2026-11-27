@@ -15,20 +15,33 @@ try {
   git('config', 'user.email', 'synthetic@example.invalid');
   mkdirSync(join(dir, 'contracts'));
   const path = join(dir, 'contracts/openapi.json');
-  writeFileSync(path, readFileSync(approved));
-  git('add', '.');
+  const baseline = join(dir, 'baseline.json');
+  const reviewedBytes = readFileSync(fixture);
+  let baselineBytes = readFileSync(approved);
+  if (baselineBytes.equals(reviewedBytes)) {
+    const healthOnly = JSON.parse(reviewedBytes.toString('utf8'));
+    delete healthOnly.paths['/v1/chat/intake-preview'];
+    baselineBytes = Buffer.from(JSON.stringify(healthOnly));
+  }
+  writeFileSync(baseline, baselineBytes);
+  writeFileSync(path, baselineBytes);
+  git('add', 'contracts/openapi.json');
   git('commit', '--quiet', '-m', 'approved synthetic contract');
   const head = git('rev-parse', 'HEAD');
-  assert.doesNotThrow(() => verifyCanonicalHistory(dir, head, head, approved));
-  writeFileSync(path, readFileSync(fixture));
-  git('add', '.');
+  assert.doesNotThrow(() => verifyCanonicalHistory(dir, head, head, baseline));
+  writeFileSync(path, reviewedBytes);
+  git('add', 'contracts/openapi.json');
   git('commit', '--quiet', '-m', 'descendant preview contract');
   const preview = git('rev-parse', 'HEAD');
   assert.equal(
     spawnSync('git', ['-C', dir, 'merge-base', '--is-ancestor', head, preview]).status,
     0,
   );
-  assert.throws(() => verifyCanonicalHistory(dir, head, preview, approved), /bytes differ/);
+  assert.throws(() => verifyCanonicalHistory(dir, head, preview, baseline), /bytes differ/);
+  assert.doesNotThrow(() => verifyCanonicalHistory(dir, preview, preview, fixture));
+  if (readFileSync(approved).equals(reviewedBytes)) {
+    assert.doesNotThrow(() => verifyCanonicalHistory(dir, preview, preview, approved));
+  }
   assert.equal(
     spawnSync(process.execPath, [
       'scripts/generate-intake-preview.mjs',
@@ -52,7 +65,7 @@ try {
     0,
   );
   process.stdout.write(
-    'Synthetic lineage: approved head passes, descendant preview blocked by canonical gate; pinned preview generator passes only reviewed bytes.\n',
+    'Synthetic lineage: old pin rejects changed bytes; preview pin accepts reviewed bytes; pinned preview generator passes only reviewed bytes.\n',
   );
 } finally {
   rmSync(dir, { recursive: true, force: true });
