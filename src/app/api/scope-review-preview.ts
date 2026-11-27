@@ -12,7 +12,7 @@ export type ScopeReviewPreview = Readonly<{
   requestedQuantity: number;
   question: string;
   evidenceIds: string[];
-  proposal: { status: 'insufficient_stock' | 'needs_review'; availableQuantity: number | null };
+  proposal: { status: 'insufficient_stock' | 'needs_review'; availableQuantity?: number | null };
   reviewRequired: true;
   persisted: false;
   commercialReady: false;
@@ -42,12 +42,17 @@ const token = /^[A-Za-z0-9._~-]+$/;
 const own = (value: object, field: string): boolean =>
   Object.prototype.hasOwnProperty.call(value, field);
 
-function record(value: unknown, keys: readonly string[]): Record<string, unknown> | null {
+function record(
+  value: unknown,
+  required: readonly string[],
+  optional: readonly string[] = [],
+): Record<string, unknown> | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return null;
   if (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null)
     return null;
   const data = value as Record<string, unknown>;
-  if (Object.keys(data).length !== keys.length || keys.some((field) => !own(data, field)))
+  if (required.some((field) => !own(data, field)) ||
+    Object.keys(data).some((field) => !required.includes(field) && !optional.includes(field)))
     return null;
   return data;
 }
@@ -57,7 +62,7 @@ export function parseScopeReviewPreview(value: unknown, projectId: string): Scop
     'schemaVersion', 'projectId', 'state', 'requestedQuantity', 'question', 'evidenceIds',
     'proposal', 'reviewRequired', 'persisted', 'commercialReady',
   ]);
-  const proposal = record(data?.['proposal'], ['status', 'availableQuantity']);
+  const proposal = record(data?.['proposal'], ['status'], ['availableQuantity']);
   if (
     !data || !proposal ||
     data['schemaVersion'] !== 'scope-review-preview.v1' ||
@@ -69,7 +74,7 @@ export function parseScopeReviewPreview(value: unknown, projectId: string): Scop
     !Array.isArray(data['evidenceIds']) ||
     !data['evidenceIds'].every((id: unknown) => typeof id === 'string') ||
     (proposal['status'] !== 'insufficient_stock' && proposal['status'] !== 'needs_review') ||
-    (proposal['availableQuantity'] !== null &&
+    (own(proposal, 'availableQuantity') && proposal['availableQuantity'] !== null &&
       (!Number.isSafeInteger(proposal['availableQuantity']) ||
         (proposal['availableQuantity'] as number) < 0)) ||
     data['reviewRequired'] !== true || data['persisted'] !== false ||

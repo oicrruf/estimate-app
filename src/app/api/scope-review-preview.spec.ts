@@ -73,6 +73,34 @@ describe('isolated authenticated scope review contract', () => {
     expect(() => parseScopeReviewPreview(inherited, projectId)).toThrow(ScopeReviewPreviewError);
   });
 
+  it('preserves an omitted quantity and accepts null or nonnegative integers', () => {
+    const omitted = parseScopeReviewPreview(
+      { ...safe, proposal: { status: 'needs_review' } }, projectId,
+    );
+    expect(Object.hasOwn(omitted.proposal, 'availableQuantity')).toBe(false);
+    expect(omitted.proposal.availableQuantity).toBeUndefined();
+    expect(parseScopeReviewPreview(
+      { ...safe, proposal: { status: 'needs_review', availableQuantity: null } }, projectId,
+    ).proposal.availableQuantity).toBeNull();
+    for (const amount of [0, 2]) {
+      expect(parseScopeReviewPreview(
+        { ...safe, proposal: { status: 'insufficient_stock', availableQuantity: amount } },
+        projectId,
+      ).proposal.availableQuantity).toBe(amount);
+    }
+  });
+
+  it('rejects invalid present quantities and unknown proposal fields', () => {
+    for (const amount of [-1, 1.5, '2', undefined, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => parseScopeReviewPreview(
+        { ...safe, proposal: { status: 'needs_review', availableQuantity: amount } }, projectId,
+      )).toThrow(ScopeReviewPreviewError);
+    }
+    expect(() => parseScopeReviewPreview(
+      { ...safe, proposal: { status: 'needs_review', unexpected: 2 } }, projectId,
+    )).toThrow(ScopeReviewPreviewError);
+  });
+
   it.each([
     [401, 'unauthorized'], [403, 'forbidden'], [404, 'not_found'], [409, 'conflict'],
     [422, 'invalid_input'], [429, 'limited'], [503, 'unavailable'],
