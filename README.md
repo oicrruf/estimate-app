@@ -22,11 +22,11 @@ missing evidence. It performs no project mutation or approval.
 
 ## API contract
 
-`estimate-api` owns the canonical OpenAPI document. This repository tracks a copy in [`contracts/openapi.json`](contracts/openapi.json) and generates the typed client in [`src/app/api/health.generated.ts`](src/app/api/health.generated.ts). The integrated contract covers only `GET /health`; it does not provide project or quotation endpoints.
+`estimate-api` owns the canonical OpenAPI document. This repository tracks a copy in [`contracts/openapi.json`](contracts/openapi.json) and checks typed clients for `GET /health` and the separate, unconnected `POST /v1/chat/intake-preview` client. The integrated contract does not provide an authenticated project scope review or quotation flow in this app.
 
 The [canonical check](scripts/check-canonical-api.mjs) fetches `estimate-api/develop`, confirms that it descends from the approved commit pinned in that script, and compares the current OpenAPI bytes with both the approved commit and this app's copy. It checks the generated client too. **The live `develop` HEAD need not equal the pin:** a descendant with identical contract bytes passes; a contract change needs a reviewed, coordinated update. API CI separately verifies that its tracked document matches FastAPI's export. Follow the [contract synchronization procedure](docs/contract-sync.md) when the contract changes; the approved reference and its update steps belong in that guide and the check, not in this README.
 
-A separate [intake preview contract guide](docs/intake-preview-contract.md) explains the draft, read-only client and its pinned public fixture. The preview is not wired to the app; its check runs after the canonical contract checks without advancing their approved reference.
+The [intake preview contract guide](docs/intake-preview-contract.md) explains its client and reviewed public fixture. A separate [authenticated scope review draft guide](docs/at-209-scope-review-contract.md) covers the pinned API PR #39 contract and its disabled integration boundary. Neither client is wired to a visible app route; the draft check does not advance the canonical reference.
 
 ## Verify and contribute
 

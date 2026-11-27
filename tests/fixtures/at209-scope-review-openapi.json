@@ -1,0 +1,1086 @@
+{
+  "components": {
+    "schemas": {
+      "AssetAvailability": {
+        "enum": [
+          "available",
+          "unavailable",
+          "unknown"
+        ],
+        "title": "AssetAvailability",
+        "type": "string"
+      },
+      "AssetValidation": {
+        "enum": [
+          "validated",
+          "unvalidated",
+          "unknown"
+        ],
+        "title": "AssetValidation",
+        "type": "string"
+      },
+      "BlockingQuestionPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "text"
+        ],
+        "title": "BlockingQuestionPayload",
+        "type": "object"
+      },
+      "Certainty": {
+        "enum": [
+          "confirmed",
+          "inferred"
+        ],
+        "title": "Certainty",
+        "type": "string"
+      },
+      "ClientAssetPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "availability": {
+            "$ref": "#/components/schemas/AssetAvailability"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/AssetValidation"
+          }
+        },
+        "required": [
+          "name",
+          "availability",
+          "validation"
+        ],
+        "title": "ClientAssetPayload",
+        "type": "object"
+      },
+      "FactPayload_list_MeasurementPayload__": {
+        "additionalProperties": false,
+        "properties": {
+          "certainty": {
+            "$ref": "#/components/schemas/Certainty"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "value": {
+            "items": {
+              "$ref": "#/components/schemas/MeasurementPayload"
+            },
+            "title": "Value",
+            "type": "array"
+          }
+        },
+        "required": [
+          "value",
+          "certainty"
+        ],
+        "title": "FactPayload[list[MeasurementPayload]]",
+        "type": "object"
+      },
+      "FactPayload_list_str__": {
+        "additionalProperties": false,
+        "properties": {
+          "certainty": {
+            "$ref": "#/components/schemas/Certainty"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "value": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Value",
+            "type": "array"
+          }
+        },
+        "required": [
+          "value",
+          "certainty"
+        ],
+        "title": "FactPayload[list[str]]",
+        "type": "object"
+      },
+      "FactPayload_str_": {
+        "additionalProperties": false,
+        "properties": {
+          "certainty": {
+            "$ref": "#/components/schemas/Certainty"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "certainty"
+        ],
+        "title": "FactPayload[str]",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "IntakePayload": {
+        "additionalProperties": false,
+        "properties": {
+          "client_assets": {
+            "items": {
+              "$ref": "#/components/schemas/ClientAssetPayload"
+            },
+            "title": "Client Assets",
+            "type": "array"
+          },
+          "client_assets_absence_evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Assets Absence Evidence"
+          },
+          "description": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exclusions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_list_str__"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "measurements": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_list_MeasurementPayload__"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "restrictions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_list_str__"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sketch": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "supplies": {
+            "items": {
+              "$ref": "#/components/schemas/SupplyItemPayload"
+            },
+            "title": "Supplies",
+            "type": "array"
+          },
+          "supplies_absence_evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplies Absence Evidence"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "IntakePayload",
+        "type": "object"
+      },
+      "IntakePreviewRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "intake": {
+            "$ref": "#/components/schemas/IntakePayload"
+          },
+          "operation": {
+            "const": "create_project",
+            "title": "Operation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation",
+          "intake"
+        ],
+        "title": "IntakePreviewRequest",
+        "type": "object"
+      },
+      "IntakePreviewResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "draft": {
+            "$ref": "#/components/schemas/ScopeDraftPayload"
+          },
+          "persisted": {
+            "const": false,
+            "default": false,
+            "title": "Persisted",
+            "type": "boolean"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "null"
+          },
+          "proposed_purchase_items": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Proposed Purchase Items",
+            "type": "array"
+          },
+          "review_required": {
+            "const": true,
+            "default": true,
+            "title": "Review Required",
+            "type": "boolean"
+          },
+          "stage": {
+            "const": "scope_review_pending",
+            "default": "scope_review_pending",
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft",
+          "proposed_purchase_items"
+        ],
+        "title": "IntakePreviewResponse",
+        "type": "object"
+      },
+      "MeasurementPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "unit"
+        ],
+        "title": "MeasurementPayload",
+        "type": "object"
+      },
+      "PreviewProposal": {
+        "properties": {
+          "availableQuantity": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availablequantity"
+          },
+          "status": {
+            "enum": [
+              "insufficient_stock",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "PreviewProposal",
+        "type": "object"
+      },
+      "PreviewRequest": {
+        "properties": {
+          "brief": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Brief",
+            "type": "string"
+          }
+        },
+        "required": [
+          "brief"
+        ],
+        "title": "PreviewRequest",
+        "type": "object"
+      },
+      "PreviewResponse": {
+        "properties": {
+          "commercialReady": {
+            "const": false,
+            "default": false,
+            "title": "Commercialready",
+            "type": "boolean"
+          },
+          "evidenceIds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidenceids",
+            "type": "array"
+          },
+          "persisted": {
+            "const": false,
+            "default": false,
+            "title": "Persisted",
+            "type": "boolean"
+          },
+          "projectId": {
+            "format": "uuid",
+            "title": "Projectid",
+            "type": "string"
+          },
+          "proposal": {
+            "$ref": "#/components/schemas/PreviewProposal"
+          },
+          "question": {
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "requestedQuantity": {
+            "minimum": 1.0,
+            "title": "Requestedquantity",
+            "type": "integer"
+          },
+          "reviewRequired": {
+            "const": true,
+            "default": true,
+            "title": "Reviewrequired",
+            "type": "boolean"
+          },
+          "schemaVersion": {
+            "const": "scope-review-preview.v1",
+            "default": "scope-review-preview.v1",
+            "title": "Schemaversion",
+            "type": "string"
+          },
+          "state": {
+            "const": "pending_review",
+            "default": "pending_review",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requestedQuantity",
+          "question",
+          "evidenceIds",
+          "proposal",
+          "projectId"
+        ],
+        "title": "PreviewResponse",
+        "type": "object"
+      },
+      "ProjectPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "ProjectPage",
+        "type": "object"
+      },
+      "ProjectView": {
+        "properties": {
+          "access_role": {
+            "enum": [
+              "owner",
+              "editor",
+              "viewer"
+            ],
+            "title": "Access Role",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "revision",
+          "access_role"
+        ],
+        "title": "ProjectView",
+        "type": "object"
+      },
+      "ScopeDraftPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "blocking_questions": {
+            "items": {
+              "$ref": "#/components/schemas/BlockingQuestionPayload"
+            },
+            "title": "Blocking Questions",
+            "type": "array"
+          },
+          "client_assets": {
+            "items": {
+              "$ref": "#/components/schemas/ClientAssetPayload"
+            },
+            "title": "Client Assets",
+            "type": "array"
+          },
+          "client_assets_absence_evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Assets Absence Evidence"
+          },
+          "contract_version": {
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exclusions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_list_str__"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "measurements": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_list_MeasurementPayload__"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "restrictions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_list_str__"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sketch": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FactPayload_str_"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "supplies": {
+            "items": {
+              "$ref": "#/components/schemas/SupplyItemPayload"
+            },
+            "title": "Supplies",
+            "type": "array"
+          },
+          "supplies_absence_evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplies Absence Evidence"
+          }
+        },
+        "required": [
+          "description",
+          "contract_version",
+          "blocking_questions"
+        ],
+        "title": "ScopeDraftPayload",
+        "type": "object"
+      },
+      "SupplyItemPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "purchase_required": {
+            "default": false,
+            "title": "Purchase Required",
+            "type": "boolean"
+          },
+          "supplied_by": {
+            "$ref": "#/components/schemas/SupplyOwner"
+          }
+        },
+        "required": [
+          "name",
+          "supplied_by"
+        ],
+        "title": "SupplyItemPayload",
+        "type": "object"
+      },
+      "SupplyOwner": {
+        "enum": [
+          "client",
+          "contractor"
+        ],
+        "title": "SupplyOwner",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "description": "Supabase Auth access token",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Versioned bootstrap contract for Estimate Agent.",
+    "title": "Estimate Agent API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "Report that the API process is responding.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/projects": {
+      "get": {
+        "operationId": "listProjects",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Invalid or missing Bearer token"
+          },
+          "403": {
+            "description": "Interactive access denied"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "description": "Authentication or storage unavailable"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Projects",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/projects/{project_id}": {
+      "get": {
+        "operationId": "getProject",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Invalid or missing Bearer token"
+          },
+          "403": {
+            "description": "Interactive access denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "description": "Authentication or storage unavailable"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Project",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/v1/chat/intake-preview": {
+      "post": {
+        "description": "Return a review proposal; no confirmation or mutation path exists here.",
+        "operationId": "previewChatIntake",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakePreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakePreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Chat Intake",
+        "tags": [
+          "chat"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/scope-review-preview": {
+      "post": {
+        "operationId": "previewScopeReviewV1",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Projectid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Actor is not admitted or cannot edit this project"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Preview already reserved"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "description": "Preview quota reached"
+          },
+          "503": {
+            "description": "Preview unavailable"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Scope Review",
+        "tags": [
+          "projects"
+        ]
+      }
+    }
+  }
+}
