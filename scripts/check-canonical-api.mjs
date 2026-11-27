@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const CANONICAL_REMOTE = 'https://github.com/oicrruf/estimate-api.git';
-const APPROVED_SHA = '6ecc9a9c5d6ba6355e3332f8b6533c81ed878b74';
+const APPROVED_SHA = '248ca4b69eb135ebff0b80fa61fb55598ba0bbb6';
 const DEVELOP_REF = 'refs/remotes/canonical/develop';
 const CONTRACT_PATH = 'contracts/openapi.json';
 
