@@ -40,39 +40,76 @@ export class ScopeComposer {
   private revision = 0;
   private accessCheck = 0;
   private retryKey: string | null = null;
+  private observedContextVersion = this.runtime.contextVersion();
+  private initialized = false;
 
   readonly draft = signal('');
   readonly ready = signal(false);
+  readonly contextEpoch = signal(0);
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly result = signal<ScopeReviewPreview | null>(null);
 
   constructor() {
     effect(() => {
-      this.runtime.contextVersion();
-      this.revision += 1;
-      this.retryKey = null;
-      void this.refreshAccess();
+      const version = this.runtime.contextVersion();
+      if (!this.initialized || version !== this.observedContextVersion) {
+        this.initialized = true;
+        this.invalidateContext(version);
+      }
     });
   }
 
+  private invalidateContext(version: number): void {
+    this.observedContextVersion = version;
+    this.contextEpoch.update((epoch) => epoch + 1);
+    this.revision += 1;
+    this.retryKey = null;
+    this.draft.set('');
+    this.result.set(null);
+    this.ready.set(false);
+    this.error.set(null);
+    void this.refreshAccess();
+  }
+
+  private revokeAccess(message: string): void {
+    this.revision += 1;
+    this.retryKey = null;
+    this.draft.set('');
+    this.result.set(null);
+    this.ready.set(false);
+    this.error.set(message);
+  }
+
   async refreshAccess(): Promise<void> {
+    const version = this.runtime.contextVersion();
+    if (version !== this.observedContextVersion) {
+      this.invalidateContext(version);
+      return;
+    }
     const accessCheck = ++this.accessCheck;
     this.ready.set(false);
     this.result.set(null);
     try {
       const editor = await this.runtime.editor();
-      if (accessCheck !== this.accessCheck) return;
+      if (accessCheck !== this.accessCheck || version !== this.runtime.contextVersion()) return;
       this.ready.set(editor?.kind === 'authenticated-project-editor');
     } catch {
-      if (accessCheck !== this.accessCheck) return;
+      if (accessCheck !== this.accessCheck || version !== this.runtime.contextVersion()) return;
       this.ready.set(false);
     }
-    if (!this.ready()) this.error.set('Necesitas una sesión con permiso editorial para continuar.');
+    if (!this.ready()) this.revokeAccess('Necesitas una sesión con permiso editorial para continuar.');
     else this.error.set(null);
   }
 
-  changeDraft(event: Event): void {
+  changeDraft(event: Event, epoch = this.contextEpoch()): void {
+    if (epoch !== this.contextEpoch()) return;
+    const version = this.runtime.contextVersion();
+    if (version !== this.observedContextVersion) {
+      this.invalidateContext(version);
+      return;
+    }
+    if (!this.ready()) return;
     this.draft.set((event.target as HTMLTextAreaElement).value);
     this.retryKey = null;
     this.revision += 1;
@@ -81,26 +118,32 @@ export class ScopeComposer {
   }
 
   canSubmit(): boolean {
-    return this.ready() && !this.busy() && !!this.draft().trim() &&
+    return this.observedContextVersion === this.runtime.contextVersion() &&
+      this.ready() && !this.busy() && !!this.draft().trim() &&
       [...this.draft()].length <= 4000;
   }
 
-  async submit(event: Event): Promise<void> {
+  async submit(event: Event, epoch = this.contextEpoch()): Promise<void> {
     event.preventDefault();
+    if (epoch !== this.contextEpoch()) return;
+    const version = this.runtime.contextVersion();
+    if (version !== this.observedContextVersion) {
+      this.invalidateContext(version);
+      return;
+    }
     if (!this.canSubmit()) return;
     this.busy.set(true);
     this.result.set(null);
     this.error.set(null);
     const revision = this.revision;
-    const contextVersion = this.runtime.contextVersion();
+    const contextVersion = version;
     const brief = this.draft();
     try {
       // Resolve again immediately before each call; a previous editor context may be revoked.
       const editor = await this.runtime.editor();
       if (contextVersion !== this.runtime.contextVersion() || revision !== this.revision) return;
       if (editor?.kind !== 'authenticated-project-editor') {
-        this.ready.set(false);
-        this.error.set('Necesitas una sesión con permiso editorial para continuar.');
+        this.revokeAccess('Necesitas una sesión con permiso editorial para continuar.');
         return;
       }
       const idempotencyKey = this.retryKey ?? globalThis.crypto.randomUUID();
@@ -113,9 +156,10 @@ export class ScopeComposer {
     } catch (cause) {
       if (revision !== this.revision || contextVersion !== this.runtime.contextVersion()) return;
       const code = cause instanceof ScopeReviewPreviewError ? cause.code : 'unavailable';
-      this.error.set(errorCopy[code]);
       if (code === 'unauthorized' || code === 'forbidden' || code === 'not_found') {
-        this.ready.set(false);
+        this.revokeAccess(errorCopy[code]);
+      } else {
+        this.error.set(errorCopy[code]);
       }
     } finally {
       this.busy.set(false);

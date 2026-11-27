@@ -77,6 +77,7 @@ describe('local scope composer', () => {
     expect(fetcher).not.toHaveBeenCalled();
     expect(composer.ready()).toBe(false);
     expect(composer.result()).toBeNull();
+    expect(composer.draft()).toBe('');
   });
 
   it('renders only confirmed pending review text with a nonempty question', async () => {
@@ -114,6 +115,7 @@ describe('local scope composer', () => {
     release(new Response(null, { status: 429 }));
     await pending;
     expect(composer.error()).toContain('límite');
+    expect(composer.draft()).toBe('Four cameras');
     await composer.submit(event());
     expect(composer.error()).toContain('no está disponible');
     await composer.submit(event());
@@ -139,6 +141,7 @@ describe('local scope composer', () => {
     await composer.submit(event());
     expect(composer.result()).toBeNull();
     expect(composer.ready()).toBe(false);
+    expect(composer.draft()).toBe('');
     await composer.submit(event());
     expect(fetcher).toHaveBeenCalledTimes(2);
     if (status === 404) expect(composer.error()).toContain('recurso no está disponible');
@@ -171,19 +174,74 @@ describe('local scope composer', () => {
     composer.changeDraft({ target: { value: 'Four cameras' } } as unknown as Event);
     await composer.submit(event());
     expect(composer.result()?.projectId).toBe(projectId);
+    const oldEpoch = composer.contextEpoch();
 
     activeEditor = { ...editor, projectId: otherProject, bearerToken: 'second-synthetic-token' };
     contextVersion.update((version) => version + 1);
     await fixture.whenStable();
     fixture.detectChanges();
     expect(composer.result()).toBeNull();
+    expect(composer.draft()).toBe('');
+    expect((fixture.nativeElement as HTMLElement).querySelector('textarea')?.value).toBe('');
     expect((fixture.nativeElement as HTMLElement).textContent).not.toContain(response.question);
 
+    composer.changeDraft({ target: { value: 'Four cameras' } } as unknown as Event, oldEpoch);
+    await composer.submit(event(), oldEpoch);
+    expect(composer.draft()).toBe('');
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    await composer.submit(event());
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(composer.result()).toBeNull();
+    composer.changeDraft({ target: { value: 'New scope for second project' } } as unknown as Event);
     await composer.submit(event());
     expect(composer.result()?.projectId).toBe(otherProject);
     const [url, options] = fetcher.mock.calls[1] as [URL, RequestInit];
     expect(url.pathname).toContain(otherProject);
     expect(options.headers).toMatchObject({ authorization: 'Bearer second-synthetic-token' });
+    expect(JSON.parse(String(options.body))).toEqual({ brief: 'New scope for second project' });
+  });
+
+  it('rejects an immediate old submit before the context effect runs', async () => {
+    const contextVersion = signal(0);
+    const fetcher = vi.fn();
+    const fixture = await mount({
+      baseUrl: 'https://api.example.invalid', contextVersion,
+      editor: async () => editor, fetcher,
+    });
+    const composer = fixture.componentInstance;
+    composer.changeDraft({ target: { value: 'Private first-project brief' } } as unknown as Event);
+    contextVersion.update((version) => version + 1);
+    // No change detection or effect flush: submit must invalidate synchronously.
+    await composer.submit(event());
+    expect(composer.draft()).toBe('');
+    expect(composer.result()).toBeNull();
+    expect(fetcher).not.toHaveBeenCalled();
+    await fixture.whenStable();
+    expect(composer.canSubmit()).toBe(false);
+  });
+
+  it('drops the old brief on logout and refuses late edit events', async () => {
+    const contextVersion = signal(0);
+    let activeEditor: typeof editor | null = editor;
+    const fetcher = vi.fn();
+    const fixture = await mount({
+      baseUrl: 'https://api.example.invalid', contextVersion,
+      editor: async () => activeEditor, fetcher,
+    });
+    const composer = fixture.componentInstance;
+    composer.changeDraft({ target: { value: 'Private first-account brief' } } as unknown as Event);
+    const oldEpoch = composer.contextEpoch();
+    activeEditor = null;
+    contextVersion.update((version) => version + 1);
+    composer.changeDraft({ target: { value: 'Private first-account brief' } } as unknown as Event);
+    expect(composer.draft()).toBe('');
+    await fixture.whenStable();
+    composer.changeDraft({ target: { value: 'Private first-account brief' } } as unknown as Event, oldEpoch);
+    await composer.submit(event(), oldEpoch);
+    await composer.submit(event());
+    expect(composer.ready()).toBe(false);
+    expect(composer.draft()).toBe('');
+    expect(fetcher).not.toHaveBeenCalled();
   });
 
   it('discards a late response from a previous project context', async () => {

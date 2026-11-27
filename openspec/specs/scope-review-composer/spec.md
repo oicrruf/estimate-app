@@ -7,7 +7,7 @@ Definir el corte local y cerrado por defecto que conecta el cliente tipado de pr
 ## Requirements
 
 ### Requirement: Compositor local cerrado por defecto
-La app SHALL mantener el compositor de preview ausente y sin solicitudes HTTP cuando no exista un adaptador confiable de sesión y proyecto. SHALL evitar ID fijo, token estático o rol introducido por la interfaz. El adaptador SHALL señalar cambios de cuenta o proyecto con una versión opaca; el compositor SHALL borrar resultados y reintentos anteriores y descartar respuestas tardías del contexto previo.
+La app SHALL mantener el compositor de preview ausente y sin solicitudes HTTP cuando no exista un adaptador confiable de sesión y proyecto. SHALL evitar ID fijo, token estático o rol introducido por la interfaz. El adaptador SHALL señalar cambios de cuenta o proyecto con una versión opaca; el compositor SHALL borrar brief, resultados y reintentos anteriores y descartar eventos y respuestas tardíos del contexto previo. SHALL exigir texto escrito de nuevo para enviar desde el contexto siguiente.
 
 #### Scenario: Portada normal
 - **GIVEN** la configuración pública sin adaptador
@@ -17,12 +17,12 @@ La app SHALL mantener el compositor de preview ausente y sin solicitudes HTTP cu
 #### Scenario: Sin editor autenticado
 - **GIVEN** un adaptador habilitado sin contexto editorial válido
 - **WHEN** se intenta evaluar
-- **THEN** el compositor no envía solicitudes y muestra una limitación de acceso.
+- **THEN** el compositor borra el brief, no envía solicitudes y muestra una limitación de acceso.
 
 #### Scenario: Cambio de proyecto o cuenta
-- **GIVEN** un resultado pendiente para un contexto editorial
+- **GIVEN** un brief o resultado para un contexto editorial
 - **WHEN** el adaptador cambia la versión de contexto
-- **THEN** desaparece el resultado anterior y una respuesta tardía no puede volver a mostrarlo.
+- **THEN** desaparecen brief y resultado, una respuesta tardía no puede volver a mostrarlos y un submit inmediato no puede enviarlos al contexto nuevo.
 
 ### Requirement: Resultado pendiente confirmado
 El compositor SHALL mostrar únicamente respuestas validadas como pendientes, no persistidas y sin preparación comercial. SHALL mostrar una pregunta no vacía, IDs de evidencia y cantidad de inventario solo si el contrato la proporciona.
