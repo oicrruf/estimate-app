@@ -1,0 +1,61 @@
+name: AT-277 Trivy app
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build app bundle for Trivy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+      - name: Build app bundle
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Transfer browser bundle only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: at277-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/estimate-app/browser/
+          if-no-files-found: error
+          retention-days: 1
+  scan:
+    name: Trivy app source and built image
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Download browser bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: at277-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/estimate-app/browser/
+      - name: Scan source and built image
+        env:
+          AT277_SUMMARY_PATH: ${{ runner.temp }}/at277-summary.json
+        run: bash ci/at-277-trivy/scan.sh
+      - name: Publish redacted counts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: at277-app-redacted-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/at277-summary.json
+          if-no-files-found: error
+          retention-days: 7
