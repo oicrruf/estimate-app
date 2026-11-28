@@ -1,0 +1,28 @@
+<section class="scope-composer" aria-labelledby="workspace-title">
+  <h2 id="workspace-title">Conversación de alcance</h2>
+  <p class="scope-note">Vista de revisión pendiente. No guarda proyectos ni aprueba compras.</p>
+  @for (epoch of [contextEpoch()]; track epoch) {
+    <form (submit)="submit($event, epoch)">
+      <label for="scope-brief">Describe el alcance a revisar</label>
+      <textarea id="scope-brief" rows="4" maxlength="4000" [value]="draft()"
+        [disabled]="!ready() || busy()" (input)="changeDraft($event, epoch)"></textarea>
+      <button type="submit" [disabled]="!canSubmit()">{{ busy() ? 'Evaluando…' : 'Revisar alcance' }}</button>
+    </form>
+  }
+  @if (!ready() && !busy()) {
+    <button class="access" type="button" (click)="refreshAccess()">Comprobar acceso</button>
+  }
+  @if (error(); as message) { <p role="alert">{{ message }}</p> }
+  @if (result(); as review) {
+    <div class="result" role="status">
+      <p><strong>Revisión humana pendiente.</strong> No persistido · Sin aprobación comercial.</p>
+      <p>Pregunta: {{ review.question }}</p>
+      <p>Cantidad solicitada: {{ review.requestedQuantity }}</p>
+      @if (review.proposal.availableQuantity !== undefined && review.proposal.availableQuantity !== null) {
+        <p>Cantidad disponible: {{ review.proposal.availableQuantity }}</p>
+      }
+      <p>Evidencias:</p>
+      <ul>@for (id of review.evidenceIds; track id) { <li>{{ id }}</li> }</ul>
+    </div>
+  }
+</section>

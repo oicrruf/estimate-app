@@ -64,6 +64,7 @@ describe('isolated authenticated scope review contract', () => {
       { ...safe, reviewRequired: false },
       { ...safe, projectId: '00000000-0000-0000-0000-000000000022' },
       { ...safe, question: null },
+      { ...safe, question: '   ' },
       { ...safe, extra: '<script>' },
       { ...safe, proposal: { ...safe.proposal, status: 'approved' } },
     ]) {

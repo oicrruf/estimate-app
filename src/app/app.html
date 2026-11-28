@@ -12,10 +12,12 @@
     </section>
     <section class="workspace" aria-labelledby="workspace-title">
       <div class="workspace-head"><span class="workspace-label">ESTIMATE / WORKSPACE</span><span class="workspace-icon" aria-hidden="true">✳</span></div>
-      @if (a2ui.messages.length === 0) {
+      @if (scopeRuntime) {
+        <app-scope-composer />
+      } @else if (a2ui.messages.length === 0) {
         <div class="empty-state"><div class="empty-icon" aria-hidden="true">◇</div><h2 id="workspace-title">Tu espacio comienza aquí</h2><p>Cuando las herramientas estén disponibles, verás el trabajo y sus resultados en este panel.</p></div>
       }
-      <div class="workspace-foot">Interfaz de base · Sin datos conectados</div>
+      <div class="workspace-foot">{{ scopeRuntime ? 'Vista pendiente · Sin aprobación comercial' : 'Interfaz de base · Sin datos conectados' }}</div>
     </section>
   </main>
   <footer>Estimate Agent <span aria-hidden="true">·</span> Preparado para el siguiente paso</footer>
